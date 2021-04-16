@@ -1,10 +1,6 @@
 # Auto populate NLB target group with ALB IPs
 
-Deploys the following:
-
-- Lambda Function & Trigger
-- IAM Policy & Role
-- S3 Bucket
+This IaC is designed to be run in an existing VPC.
 
 Prerequisites:
 
@@ -13,9 +9,15 @@ Prerequisites:
 - Both the internal Application Load Balancer and Network Load Balancer need to be in the same Availability Zones
 - An IP-address-based target group for the NLB (This is the group the lambda funtion will update)
 
+Deploys the following:
+
+- Lambda Function & Trigger
+- IAM Policy & Role
+- S3 Bucket
+
 ## Inputs
 
-Update terraform.tfvars
+Update terraform.tfvars prior to running `terraform apply`
 
 | Name         | Description                                   | Type   | Default | Required |
 | ------------ | --------------------------------------------- | ------ | ------- | -------- |
