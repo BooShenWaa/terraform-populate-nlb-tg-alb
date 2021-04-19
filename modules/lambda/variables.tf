@@ -28,7 +28,7 @@ variable "policy_name" {
 variable "additional_tags" {
   default = {
     terraform = true,
-    creator = "CHS"
+    creator = "aaron"
   }
   description = "Default resource tags"
   tags = map(string)
