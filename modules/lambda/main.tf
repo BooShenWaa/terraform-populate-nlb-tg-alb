@@ -12,6 +12,8 @@ resource "aws_iam_policy" "lambda_policy" {
   # policy      = file("./modules/lambda/nlb_TG_populate_policy.json")
   # "Resource": "*",
   policy = templatefile("./modules/lambda/nlb_TG_populate_policy.json", { bucket-arn = aws_s3_bucket.populate_nlb_tg_bucket.arn })
+
+  tags = var.additional_tags
 }
 
 # Creates the Lambda Role 
@@ -33,14 +35,17 @@ resource "aws_iam_role" "lb-lambda-role" {
     ]
   })
 
-  tags = {
-    Name = var.role_name
-  }
+  tags = merge(
+    var.additional_tags,
+    {
+      Name = var.role_name
+    }
+  )
 }
 
 # Attaches the policy to the role
 
-resource "aws_iam_role_policy_attachment" "test-attach" {
+resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.lb-lambda-role.name
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
@@ -66,6 +71,13 @@ resource "aws_s3_bucket" "populate_nlb_tg_bucket" {
       }
     }
   }
+
+  tags = merge(
+    var.additional_tags,
+    {
+      Description = "Bucket used to store data for the populate_NLB_TG_with_ALB Lambda function"
+    }
+  )
 }
 
 resource "aws_s3_bucket_public_access_block" "example" {
@@ -106,9 +118,12 @@ resource "aws_lambda_function" "populate_NLB_TG" {
     }
   }
 
-  tags = {
-    Name = var.lambda_name
-  }
+  tags = merge(
+    var.additional_tags,
+    {
+      Name = var.lambda_name
+    }
+  )
 }
 
 # Schedule Lambda
