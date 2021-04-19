@@ -9,7 +9,9 @@ resource "aws_iam_policy" "lambda_policy" {
   name        = var.policy_name
   description = "Policy to allow lambda to update NLB target groups with ALB IPs"
 
-  policy      = file("./modules/lambda/nlb_TG_populate_policy.json")
+  # policy      = file("./modules/lambda/nlb_TG_populate_policy.json")
+  # "Resource": "*",
+  policy = templatefile("./modules/lambda/nlb_TG_populate_policy.json", { bucket-arn = aws_s3_bucket.populate_nlb_tg_bucket.arn })
 }
 
 # Creates the Lambda Role 
@@ -55,6 +57,22 @@ resource "aws_s3_bucket" "populate_nlb_tg_bucket" {
   versioning {
     enabled = false
   }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        # kms_master_key_id = aws_kms_key.mykey.arn
+        sse_algorithm     = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "example" {
+  bucket = aws_s3_bucket.populate_nlb_tg_bucket.id
+
+  block_public_acls   = true
+  block_public_policy = true
 }
 
 # LAMBDA
@@ -69,12 +87,12 @@ data "archive_file" "init"{
 }
 
 resource "aws_lambda_function" "populate_NLB_TG" {
-  function_name    = "populate_NLB_TG"
+  function_name    = var.lambda_name
   filename         = data.archive_file.init.output_path
   source_code_hash = filebase64sha256(data.archive_file.init.output_path)
   role             = aws_iam_role.lb-lambda-role.arn
   handler          = "populate_NLB_TG_with_ALB.lambda_handler"
-  runtime          = "python2.7"
+  runtime          = "python3.6"
 
   environment {
     variables = {
@@ -92,8 +110,6 @@ resource "aws_lambda_function" "populate_NLB_TG" {
     Name = var.lambda_name
   }
 }
-
-
 
 # Schedule Lambda
 resource "aws_cloudwatch_event_rule" "populate_NLB_TG" {

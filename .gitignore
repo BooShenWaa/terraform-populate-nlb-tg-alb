@@ -11,6 +11,9 @@
 *.tfstate
 *.tfstate.*
 
+# Archived function files
+modules/lambda/*.zip
+
 # Crash log files
 crash.log
 

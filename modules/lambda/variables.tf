@@ -1,7 +1,6 @@
 variable "lambda_name" {
   type        = string
-  description = "Name tag of the lambda function"
-  default     = "populate_NLB_TG_with_ALB"
+  description = "Name of the lambda function"
 }
 
 variable "alb_dns_name" {
@@ -26,3 +25,11 @@ variable "policy_name" {
   default     = "populate_NLB_TG_with_ALB"
 }
 
+variable "additional_tags" {
+  default = {
+    terraform = true,
+    creator = "CHS"
+  }
+  description = "Default resource tags"
+  tags = map(string)
+}

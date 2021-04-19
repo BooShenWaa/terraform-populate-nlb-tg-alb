@@ -13,7 +13,7 @@ provider "aws" {
 
 module "populate_nlb_tg" {
   source        = "./modules/lambda"
-  lambda_name   = "populate_NLB_TG_with_ALB"
+  lambda_name   = var.lambda_name
   alb_dns_name  = var.alb_dns_name
   nlb_tg_arn    = var.nlb_tg_arn
 }
